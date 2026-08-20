@@ -11,37 +11,22 @@ from config import get_llm
 
 llm = get_llm()
 
-
 class EvidenceClaim(BaseModel):
-
     claim: str
-
     population: str = ""
-
     intervention: str = ""
-
     comparator: str = ""
-
     outcome: str = ""
-
     study_type: str = ""
-
     sample_size: str = ""
-
     effect: str = ""
-
     limitations: List[str] = Field(
         default_factory=list
     )
 
-
-
-
-
 claim_llm = llm.with_structured_output(
     EvidenceClaim
 )
-
 
 def extract_claim(article):
 
@@ -69,21 +54,17 @@ Extract:
 - Limitations if available
 """)
     ]
-
-
     result = claim_llm.invoke(
         messages
     )
 
     return result.model_dump()
 
-
 def literature_agent(state):
 
     plan = state[
         "research_plan"
     ]
-
     literature_tasks = plan.get(
         "literature_tasks",
         []
@@ -91,9 +72,7 @@ def literature_agent(state):
 
     all_articles = []
 
-    # -----------------------------------------
     # Search PubMed for each research task
-    # -----------------------------------------
 
     for task in literature_tasks:
 
@@ -107,9 +86,7 @@ def literature_agent(state):
             articles
         )
 
-    # -----------------------------------------
     # Remove duplicate papers
-    # -----------------------------------------
 
     unique_articles = {}
 
@@ -123,10 +100,7 @@ def literature_agent(state):
         unique_articles.values()
     )
 
-    # -----------------------------------------
     # Extract claims
-    # -----------------------------------------
-
     claims = []
 
     for article in all_articles:

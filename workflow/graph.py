@@ -26,6 +26,18 @@ from agents.validator import (
     validation_agent
 )
 
+from agents.retrieval import (
+    retrieval_agent
+)
+
+from agents.grounding import (
+    grounding_agent
+)
+
+from agents.evidence_sufficiency import (
+    evidence_sufficiency_agent
+)
+
 from agents.contradiction import (
     contradiction_agent
 )
@@ -78,6 +90,21 @@ workflow.add_node(
 )
 
 workflow.add_node(
+    "retrieval",
+    retrieval_agent
+)
+
+workflow.add_node(
+    "grounding",
+    grounding_agent
+)
+
+workflow.add_node(
+    "evidence_sufficiency",
+    evidence_sufficiency_agent
+)
+
+workflow.add_node(
     "contradiction",
     contradiction_agent
 )
@@ -106,11 +133,27 @@ workflow.add_edge("planner", "literature")
 workflow.add_edge("planner", "clinical")
 workflow.add_edge("planner", "statistics")
 
-workflow.add_edge("literature", "validation")
+workflow.add_edge("literature", "retrieval")
 
-workflow.add_edge(
-    "validation",
-    "contradiction"
+workflow.add_edge("retrieval", "grounding")
+workflow.add_edge("grounding", "validation")
+
+workflow.add_edge("validation", "evidence_sufficiency")
+
+
+def route_after_evidence_check(state):
+    if state.get("evidence_sufficient"):
+        return "contradiction"
+    return "retrieval"
+
+
+workflow.add_conditional_edges(
+    "evidence_sufficiency",
+    route_after_evidence_check,
+    {
+        "retrieval": "retrieval",
+        "contradiction": "contradiction"
+    }
 )
 
 workflow.add_edge(

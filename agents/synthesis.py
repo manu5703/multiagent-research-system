@@ -57,6 +57,12 @@ CONTRADICTION ANALYSIS:
 EVIDENCE GRADES:
 {evidence_scores}
 
+RETRIEVED EVIDENCE WITH PROVENANCE:
+{state.get('retrieved_evidence', [])}
+
+EVIDENCE-SUFFICIENCY DECISION:
+{state.get('evidence_sufficiency_reason', '')}
+
 Write the report using these sections:
 
 1. Research Question
@@ -78,6 +84,8 @@ IMPORTANT RULES:
 - Do not describe a guideline's recommendations unless its content is supplied.
 - Clearly identify uncertainty.
 - Cite literature using PMID values when available.
+- For every clinical or research finding, cite its supplied PMID or evidence_id.
+- Do not use a source merely because it was retrieved; use only validated claims.
 - Use only the evidence supplied to you.
 """)
     ]

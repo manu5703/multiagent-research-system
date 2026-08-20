@@ -336,3 +336,62 @@ WORKFLOW SUMMARY
 Literature articles: 2
 Extracted claims: 2
 Clinical sources: 4
+
+## Local RAG evidence layer
+
+The workflow retrieves evidence from PubMed abstracts and approved local
+documents before validating claims. Add only de-identified, authorized source
+material under `data/knowledge_base/`; the directory supports `.txt`, `.json`,
+and `.jsonl` files. A JSON document should preserve provenance:
+
+```json
+{
+  "source_id": "ada_2026_pharmacotherapy",
+  "source_type": "clinical_guideline",
+  "organization": "American Diabetes Association",
+  "title": "Standards of Care in Diabetes",
+  "publication_date": "2026-01-01",
+  "document_version": "2026",
+  "url": "https://example.org/official-source",
+  "section": "Pharmacologic Approaches",
+  "content": "Authorized source passage goes here."
+}
+```
+
+The initial retriever uses local TF-IDF search (no new dependency or external
+vector database). Each retrieved passage receives an `evidence_id`; a claim can
+advance only if validation attaches supporting evidence IDs. The workflow makes
+at most two retrieval passes before reporting remaining evidence limitations.
+
+Never ingest PHI, patient notes, copyrighted full text without authorization,
+or unvetted health content. For production, replace the local retriever behind
+`tools/rag.py` with an approved embedding model and vector store, while keeping
+the provenance fields and validation gate.
+
+### PDF ingestion
+
+Place authorized, text-based PDFs in `data/source_pdfs/`, then run:
+
+```bash
+python3 ingest_pdfs.py
+```
+
+The command extracts each PDF page and writes source-traceable JSON under
+`data/knowledge_base/pdfs/`, where the RAG retriever automatically finds it.
+To preserve source provenance, add an optional sidecar file beside each PDF
+named `<pdf filename>.metadata.json`, for example `ada_2026.metadata.json`:
+
+```json
+{
+  "organization": "American Diabetes Association",
+  "title": "Standards of Care in Diabetes",
+  "source_type": "clinical_guideline",
+  "publication_date": "2026-01-01",
+  "document_version": "2026",
+  "url": "https://official-source-url"
+}
+```
+
+Run `python3 ingest_pdfs.py --force` after replacing a PDF. Image-only/scanned
+PDFs require OCR before they can be ingested; the command reports them rather
+than creating empty evidence records.

@@ -14,6 +14,14 @@ class ResearchState(TypedDict, total=False):
 
     claims: List[Dict[str, Any]]
 
+    # RAG EVIDENCE
+    retrieved_evidence: List[Dict[str, Any]]
+    retrieval_queries: List[str]
+    retrieval_attempts: int
+    evidence_sufficient: bool
+    evidence_sufficiency_reason: str
+    grounded_claims: List[Dict[str, Any]]
+
     # CLINICAL GUIDELINES
     clinical_guidelines: List[Dict[str, Any]]
 

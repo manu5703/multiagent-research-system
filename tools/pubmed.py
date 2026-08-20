@@ -19,7 +19,6 @@ PUBMED_EMAIL = os.getenv(
 
 Entrez.email = PUBMED_EMAIL
 
-
 def configure_ssl():
     """Configure urllib, which Biopython Entrez uses, with a trusted CA bundle."""
 
@@ -43,9 +42,7 @@ def configure_ssl():
     )
     urllib.request.install_opener(opener)
 
-
 configure_ssl()
-
 
 def _entrez_request(operation, **kwargs):
     try:
@@ -68,7 +65,6 @@ def search_pubmed(
     query: str,
     max_results: int = None
 ):
-
     if max_results is None:
         max_results = MAX_PUBMED_RESULTS
 
@@ -89,7 +85,6 @@ def search_pubmed(
         for x in record["IdList"]
     ]
 
-
 def fetch_pubmed_articles(pmids):
     """
     Retrieve article metadata and abstracts from PubMed.
@@ -107,9 +102,7 @@ def fetch_pubmed_articles(pmids):
     )
 
     records = Entrez.read(handle)
-
     handle.close()
-
     articles = []
 
     for article in records["PubmedArticle"]:
@@ -125,10 +118,6 @@ def fetch_pubmed_articles(pmids):
                 ""
             )
         )
-
-        # ------------------------------------------
-        # Abstract
-        # ------------------------------------------
 
         abstract = ""
 
@@ -155,9 +144,7 @@ def fetch_pubmed_articles(pmids):
                 abstract_parts
             )
 
-        # ------------------------------------------
         # Journal
-        # ------------------------------------------
 
         journal = ""
 
@@ -169,10 +156,7 @@ def fetch_pubmed_articles(pmids):
                     ""
                 )
             )
-
-        # ------------------------------------------
         # Publication year
-        # ------------------------------------------
 
         year = ""
 
@@ -194,14 +178,9 @@ def fetch_pubmed_articles(pmids):
         except Exception:
             year = ""
 
-        # ------------------------------------------
         # DOI
-        # ------------------------------------------
-
         doi = ""
-
         try:
-
             article_ids = article.get(
                 "PubmedData",
                 {}
@@ -222,19 +201,12 @@ def fetch_pubmed_articles(pmids):
             doi = ""
 
         articles.append({
-
             "pmid": pmid,
-
             "title": title,
-
             "abstract": abstract,
-
             "journal": journal,
-
             "year": year,
-
             "doi": doi,
-
             "source": (
                 f"https://pubmed.ncbi.nlm.nih.gov/"
                 f"{pmid}/"
